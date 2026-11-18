@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { MatchCard } from '../components/MatchCard'
+import { media, venueImage } from '../media'
 import { formatGameDate } from '../lib/standings'
 import { useStore } from '../store'
 
@@ -32,7 +33,9 @@ export function Schedule() {
       a.startsAt.localeCompare(b.startsAt),
     )
     if (filter === 'upcoming') {
-      list = list.filter((g) => g.status === 'scheduled' || g.status === 'postponed')
+      list = list.filter(
+        (g) => g.status === 'scheduled' || g.status === 'postponed',
+      )
     } else if (filter === 'done') {
       list = list.filter((g) => g.status === 'final')
     }
@@ -51,29 +54,35 @@ export function Schedule() {
       key,
       label: dayHeading(items[0].startsAt),
       items,
+      cover: venueImage(key + items[0].venue),
     }))
   }, [games])
 
   const teamName = (id: string) =>
     state.teams.find((t) => t.id === id)?.name ?? '—'
-  const teamShort = (id: string) =>
-    state.teams.find((t) => t.id === id)?.shortName ?? '—'
-  const teamColor = (id: string) =>
-    state.teams.find((t) => t.id === id)?.colorHint
 
   const scrollBy = (dir: -1 | 1) => {
     const el = scrollerRef.current
     if (!el) return
-    el.scrollBy({ left: dir * Math.min(el.clientWidth * 0.85, 360), behavior: 'smooth' })
+    el.scrollBy({
+      left: dir * Math.min(el.clientWidth * 0.85, 360),
+      behavior: 'smooth',
+    })
   }
 
   return (
     <div className="page">
-      <h1 className="page-title">일정</h1>
-      <p className="page-lead">
-        {state.league.name} {state.league.seasonLabel} — 날짜별 슬라이드로
-        한눈에 봅니다.
-      </p>
+      <header className="page-banner">
+        <img src={media.outfield} alt="" aria-hidden />
+        <div className="page-banner-shade" />
+        <div className="page-banner-copy">
+          <h1 className="page-title">일정</h1>
+          <p className="page-lead">
+            {state.league.name} {state.league.seasonLabel} — 팀 로고와 스코어
+            카드로 최근 경기를 봅니다.
+          </p>
+        </div>
+      </header>
 
       <div className="tabs">
         <button
@@ -99,18 +108,51 @@ export function Schedule() {
         </button>
       </div>
 
+      <section className="band band-schedule" style={{ marginTop: '0.5rem' }}>
+        <div className="band-inner">
+          <h2>경기 카드</h2>
+          <p className="muted">팀 로고와 스코어 · 가로로 넘겨 확인하세요.</p>
+        </div>
+        <div className="fixture-rail fixture-rail-home">
+          {games.map((g) => (
+            <MatchCard
+              key={g.id}
+              large
+              game={g}
+              home={state.teams.find((t) => t.id === g.homeTeamId)}
+              away={state.teams.find((t) => t.id === g.awayTeamId)}
+              result={state.results.find((r) => r.gameId === g.id)}
+            />
+          ))}
+        </div>
+      </section>
+
       <div className="rail-controls">
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => scrollBy(-1)}>
-          이전
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => scrollBy(-1)}
+        >
+          이전 날짜
         </button>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => scrollBy(1)}>
-          다음
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => scrollBy(1)}
+        >
+          다음 날짜
         </button>
       </div>
 
       <div className="day-rail" ref={scrollerRef}>
         {days.map((day) => (
-          <section key={day.key} className="day-slide" aria-label={day.label}>
+          <section
+            key={day.key}
+            className="day-slide day-slide-photo"
+            aria-label={day.label}
+          >
+            <img className="day-slide-bg" src={day.cover} alt="" aria-hidden />
+            <div className="day-slide-overlay" />
             <header className="day-slide-head">
               <h2>{day.label}</h2>
               <span>{day.items.length}경기</span>
@@ -118,49 +160,31 @@ export function Schedule() {
             <div className="day-slide-body">
               {day.items.map((g) => {
                 const result = state.results.find((r) => r.gameId === g.id)
+                const home = state.teams.find((t) => t.id === g.homeTeamId)
+                const away = state.teams.find((t) => t.id === g.awayTeamId)
                 return (
-                  <article key={g.id} className="match-tile">
+                  <article key={g.id} className="match-tile match-tile-glass">
                     <div className="match-tile-meta">
-                      <time dateTime={g.startsAt}>{formatGameDate(g.startsAt)}</time>
+                      <time dateTime={g.startsAt}>
+                        {formatGameDate(g.startsAt)}
+                      </time>
                       <span className={`status-pill status-${g.status}`}>
                         {statusLabel[g.status]}
                       </span>
                     </div>
-                    <div className="match-tile-teams">
-                      <div>
-                        <span
-                          className="team-swatch"
-                          style={{ background: teamColor(g.awayTeamId) }}
-                        />
-                        <strong>{teamShort(g.awayTeamId)}</strong>
-                        <span className="muted-inline">{teamName(g.awayTeamId)}</span>
-                      </div>
-                      <div>
-                        <span
-                          className="team-swatch"
-                          style={{ background: teamColor(g.homeTeamId) }}
-                        />
-                        <strong>{teamShort(g.homeTeamId)}</strong>
-                        <span className="muted-inline">{teamName(g.homeTeamId)}</span>
-                      </div>
+                    <div className="mini-logos">
+                      <img src={away?.logoDataUrl} alt="" width={36} height={36} />
+                      <span>
+                        {away?.shortName} vs {home?.shortName}
+                      </span>
+                      <img src={home?.logoDataUrl} alt="" width={36} height={36} />
                     </div>
                     {result ? (
-                      <div className="score-chip match-score">
-                        {result.awayRuns} — {result.homeRuns}
+                      <div className="score-chip match-score pulse-amber">
+                        {result.awayRuns}:{result.homeRuns}
                       </div>
                     ) : (
                       <p className="match-venue">{g.venue}</p>
-                    )}
-                    {result && (
-                      <p className="match-venue">
-                        {g.venue}
-                        {result.note ? ` · ${result.note}` : ''}
-                      </p>
-                    )}
-                    {g.status === 'final' && (
-                      <Link className="row-meta" to={`/ops/games/${g.id}`}>
-                        이닝 득점판
-                      </Link>
                     )}
                   </article>
                 )
@@ -173,16 +197,21 @@ export function Schedule() {
 
       <section className="section">
         <h2>목록으로 보기</h2>
-        <p className="muted">전체 대진을 세로로도 확인할 수 있습니다.</p>
         <div className="list">
           {games.map((g, i) => {
             const result = state.results.find((r) => r.gameId === g.id)
             return (
               <div
                 key={g.id}
-                className="row-item"
+                className="row-item row-item-visual"
                 style={{ animationDelay: `${i * 0.04}s` }}
               >
+                <img
+                  className="row-thumb"
+                  src={venueImage(g.id)}
+                  alt=""
+                  aria-hidden
+                />
                 <div>
                   <div className="matchup">
                     {teamName(g.awayTeamId)} @ {teamName(g.homeTeamId)}
@@ -194,7 +223,7 @@ export function Schedule() {
                 <div style={{ textAlign: 'right' }}>
                   {result ? (
                     <div className="score-chip">
-                      {result.awayRuns} — {result.homeRuns}
+                      {result.awayRuns}:{result.homeRuns}
                     </div>
                   ) : (
                     <span className="row-meta">{statusLabel[g.status]}</span>

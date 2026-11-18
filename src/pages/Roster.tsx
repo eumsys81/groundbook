@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { media } from '../media'
 import {
   battingAvg,
   era,
@@ -28,11 +29,17 @@ export function Roster() {
 
   return (
     <div className="page">
-      <h1 className="page-title">명단</h1>
-      <p className="page-lead">
-        팀별 로스터와 시즌 타격·투수 기록입니다. 선수를 누르면 개인 상세로
-        이동합니다.
-      </p>
+      <header className="page-banner">
+        <img src={media.dugout} alt="" aria-hidden />
+        <div className="page-banner-shade" />
+        <div className="page-banner-copy">
+          <h1 className="page-title">명단</h1>
+          <p className="page-lead">
+            팀별 로스터와 시즌 타격·투수 기록입니다. 선수를 누르면 개인 상세로
+            이동합니다.
+          </p>
+        </div>
+      </header>
       <div className="tabs">
         {state.teams.map((t) => (
           <button

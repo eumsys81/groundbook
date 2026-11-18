@@ -5,7 +5,8 @@ const links = [
   { to: '/schedule', label: '일정' },
   { to: '/results', label: '결과' },
   { to: '/standings', label: '순위' },
-  { to: '/leaders', label: '기록', end: false },
+  { to: '/leaders', label: '기록' },
+  { to: '/teams', label: '팀' },
   { to: '/roster', label: '명단' },
   { to: '/ops', label: '운영실', ops: true },
 ]

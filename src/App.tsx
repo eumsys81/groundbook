@@ -7,6 +7,8 @@ import { Results } from './pages/Results'
 import { Standings } from './pages/Standings'
 import { Leaders } from './pages/Leaders'
 import { Roster } from './pages/Roster'
+import { Teams } from './pages/Teams'
+import { TeamDetail } from './pages/TeamDetail'
 import { PlayerDetail } from './pages/PlayerDetail'
 import { OpsOverview } from './pages/ops/Overview'
 import { LeagueAdmin } from './pages/ops/LeagueAdmin'
@@ -28,6 +30,8 @@ export default function App() {
             <Route path="results" element={<Results />} />
             <Route path="standings" element={<Standings />} />
             <Route path="leaders" element={<Leaders />} />
+            <Route path="teams" element={<Teams />} />
+            <Route path="teams/:id" element={<TeamDetail />} />
             <Route path="roster" element={<Roster />} />
             <Route path="players/:id" element={<PlayerDetail />} />
           </Route>

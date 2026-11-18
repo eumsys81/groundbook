@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
+import { media } from '../media'
 import {
   battingAvg,
   era,
@@ -35,19 +36,25 @@ export function PlayerDetail() {
 
   return (
     <div className="page">
-      <p className="crumb">
-        <Link to="/roster">명단</Link> / {player.name}
-      </p>
-      <h1 className="page-title">
-        #{player.number} {player.name}
-      </h1>
-      <p className="page-lead">
-        <span
-          className="team-swatch"
-          style={{ background: team?.colorHint }}
-        />
-        {team?.name} · {player.position} · {state.league.seasonLabel}
-      </p>
+      <header className="player-hero">
+        <img src={media.ball} alt="" aria-hidden />
+        <div className="player-hero-shade" />
+        <div className="player-hero-copy">
+          <p className="crumb">
+            <Link to="/roster">명단</Link> / {player.name}
+          </p>
+          <h1 className="page-title">
+            #{player.number} {player.name}
+          </h1>
+          <p className="page-lead">
+            <span
+              className="team-swatch"
+              style={{ background: team?.colorHint }}
+            />
+            {team?.name} · {player.position} · {state.league.seasonLabel}
+          </p>
+        </div>
+      </header>
 
       {bat && (
         <section className="section" style={{ paddingTop: '0.5rem' }}>

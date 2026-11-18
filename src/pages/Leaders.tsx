@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { media } from '../media'
 import {
   BAT_LEADER_META,
   PITCH_LEADER_META,
@@ -30,12 +31,18 @@ export function Leaders() {
 
   return (
     <div className="page">
-      <h1 className="page-title">기록</h1>
-      <p className="page-lead">
-        시즌 누적 기준으로 타율·홈런·안타·볼넷·도루·방어율·삼진 등 항목별
-        순위를 봅니다. (타율·출루·장타·방어율·WHIP은 규정 타석/이닝 충족
-        선수만)
-      </p>
+      <header className="page-banner">
+        <img src={media.ball} alt="" aria-hidden />
+        <div className="page-banner-shade" />
+        <div className="page-banner-copy">
+          <h1 className="page-title">기록</h1>
+          <p className="page-lead">
+            시즌 누적 기준으로 타율·홈런·안타·볼넷·도루·방어율·삼진 등 항목별
+            순위를 봅니다. (타율·출루·장타·방어율·WHIP은 규정 타석/이닝 충족
+            선수만)
+          </p>
+        </div>
+      </header>
 
       <div className="tabs">
         <button
@@ -79,8 +86,9 @@ export function Leaders() {
       </div>
 
       <h2 className="board-heading">{activeLabel} 순위</h2>
-      <div className="table-wrap">
-        <table className="data">
+      <div className="scoreboard board-enter table-wrap">
+        <div className="scoreboard-glow" aria-hidden />
+        <table className="data scoreboard-table">
           <thead>
             <tr>
               <th className="num">#</th>
@@ -105,7 +113,7 @@ export function Leaders() {
                   />
                   {row.team?.shortName}
                 </td>
-                <td className="num leader-val">{row.display}</td>
+                <td className="num leader-val pulse-amber">{row.display}</td>
               </tr>
             ))}
             {rows.length === 0 && (
