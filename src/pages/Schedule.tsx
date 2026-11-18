@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { media, venueImage } from '../media'
 import { formatGameDate } from '../lib/standings'
 import { useStore } from '../store'
 
@@ -32,7 +33,9 @@ export function Schedule() {
       a.startsAt.localeCompare(b.startsAt),
     )
     if (filter === 'upcoming') {
-      list = list.filter((g) => g.status === 'scheduled' || g.status === 'postponed')
+      list = list.filter(
+        (g) => g.status === 'scheduled' || g.status === 'postponed',
+      )
     } else if (filter === 'done') {
       list = list.filter((g) => g.status === 'final')
     }
@@ -51,6 +54,7 @@ export function Schedule() {
       key,
       label: dayHeading(items[0].startsAt),
       items,
+      cover: venueImage(key + items[0].venue),
     }))
   }, [games])
 
@@ -64,16 +68,25 @@ export function Schedule() {
   const scrollBy = (dir: -1 | 1) => {
     const el = scrollerRef.current
     if (!el) return
-    el.scrollBy({ left: dir * Math.min(el.clientWidth * 0.85, 360), behavior: 'smooth' })
+    el.scrollBy({
+      left: dir * Math.min(el.clientWidth * 0.85, 360),
+      behavior: 'smooth',
+    })
   }
 
   return (
     <div className="page">
-      <h1 className="page-title">일정</h1>
-      <p className="page-lead">
-        {state.league.name} {state.league.seasonLabel} — 날짜별 슬라이드로
-        한눈에 봅니다.
-      </p>
+      <header className="page-banner">
+        <img src={media.outfield} alt="" aria-hidden />
+        <div className="page-banner-shade" />
+        <div className="page-banner-copy">
+          <h1 className="page-title">일정</h1>
+          <p className="page-lead">
+            {state.league.name} {state.league.seasonLabel} — 날짜별 슬라이드로
+            한눈에 봅니다.
+          </p>
+        </div>
+      </header>
 
       <div className="tabs">
         <button
@@ -100,17 +113,27 @@ export function Schedule() {
       </div>
 
       <div className="rail-controls">
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => scrollBy(-1)}>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => scrollBy(-1)}
+        >
           이전
         </button>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => scrollBy(1)}>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => scrollBy(1)}
+        >
           다음
         </button>
       </div>
 
       <div className="day-rail" ref={scrollerRef}>
         {days.map((day) => (
-          <section key={day.key} className="day-slide" aria-label={day.label}>
+          <section key={day.key} className="day-slide day-slide-photo" aria-label={day.label}>
+            <img className="day-slide-bg" src={day.cover} alt="" aria-hidden />
+            <div className="day-slide-overlay" />
             <header className="day-slide-head">
               <h2>{day.label}</h2>
               <span>{day.items.length}경기</span>
@@ -119,9 +142,11 @@ export function Schedule() {
               {day.items.map((g) => {
                 const result = state.results.find((r) => r.gameId === g.id)
                 return (
-                  <article key={g.id} className="match-tile">
+                  <article key={g.id} className="match-tile match-tile-glass">
                     <div className="match-tile-meta">
-                      <time dateTime={g.startsAt}>{formatGameDate(g.startsAt)}</time>
+                      <time dateTime={g.startsAt}>
+                        {formatGameDate(g.startsAt)}
+                      </time>
                       <span className={`status-pill status-${g.status}`}>
                         {statusLabel[g.status]}
                       </span>
@@ -133,7 +158,9 @@ export function Schedule() {
                           style={{ background: teamColor(g.awayTeamId) }}
                         />
                         <strong>{teamShort(g.awayTeamId)}</strong>
-                        <span className="muted-inline">{teamName(g.awayTeamId)}</span>
+                        <span className="muted-inline">
+                          {teamName(g.awayTeamId)}
+                        </span>
                       </div>
                       <div>
                         <span
@@ -141,11 +168,13 @@ export function Schedule() {
                           style={{ background: teamColor(g.homeTeamId) }}
                         />
                         <strong>{teamShort(g.homeTeamId)}</strong>
-                        <span className="muted-inline">{teamName(g.homeTeamId)}</span>
+                        <span className="muted-inline">
+                          {teamName(g.homeTeamId)}
+                        </span>
                       </div>
                     </div>
                     {result ? (
-                      <div className="score-chip match-score">
+                      <div className="score-chip match-score pulse-amber">
                         {result.awayRuns} — {result.homeRuns}
                       </div>
                     ) : (
@@ -180,9 +209,15 @@ export function Schedule() {
             return (
               <div
                 key={g.id}
-                className="row-item"
+                className="row-item row-item-visual"
                 style={{ animationDelay: `${i * 0.04}s` }}
               >
+                <img
+                  className="row-thumb"
+                  src={venueImage(g.id)}
+                  alt=""
+                  aria-hidden
+                />
                 <div>
                   <div className="matchup">
                     {teamName(g.awayTeamId)} @ {teamName(g.homeTeamId)}

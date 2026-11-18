@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { media } from '../media'
 import { battingLeaders, pitchingLeaders } from '../lib/stats'
 import { computeStandings, formatGb, formatPct } from '../lib/standings'
 import { useStore } from '../store'
@@ -13,18 +14,25 @@ export function Standings() {
 
   return (
     <div className="page">
-      <h1 className="page-title">순위</h1>
-      <p className="page-lead">
-        팀 승패 순위와 주요 개인 기록 톱5입니다. 전체 항목 순위는{' '}
-        <Link className="inline-link" to="/leaders">
-          기록
-        </Link>
-        에서 확인하세요.
-      </p>
+      <header className="page-banner">
+        <img src={media.dugout} alt="" aria-hidden />
+        <div className="page-banner-shade" />
+        <div className="page-banner-copy">
+          <h1 className="page-title">순위</h1>
+          <p className="page-lead">
+            팀 승패 순위와 주요 개인 기록 톱5입니다. 전체 항목 순위는{' '}
+            <Link className="inline-link" to="/leaders">
+              기록
+            </Link>
+            에서 확인하세요.
+          </p>
+        </div>
+      </header>
 
       <h2 className="board-heading">팀 순위</h2>
-      <div className="table-wrap">
-        <table className="data">
+      <div className="scoreboard board-enter table-wrap">
+        <div className="scoreboard-glow" aria-hidden />
+        <table className="data scoreboard-table">
           <thead>
             <tr>
               <th>#</th>
@@ -45,7 +53,7 @@ export function Standings() {
               const diff = row.runsFor - row.runsAgainst
               return (
                 <tr key={row.teamId}>
-                  <td>{idx + 1}</td>
+                  <td className="board-rank">{idx + 1}</td>
                   <td>
                     <span
                       className="team-swatch"
@@ -53,14 +61,14 @@ export function Standings() {
                     />
                     {team?.name}
                   </td>
-                  <td className="num">{row.wins}</td>
-                  <td className="num">{row.losses}</td>
-                  <td className="num">{row.ties}</td>
-                  <td className="num">{formatPct(row.pct)}</td>
-                  <td className="num">{formatGb(row.gb)}</td>
-                  <td className="num">{row.runsFor}</td>
-                  <td className="num">{row.runsAgainst}</td>
-                  <td className="num">
+                  <td className="num board-num">{row.wins}</td>
+                  <td className="num board-num">{row.losses}</td>
+                  <td className="num board-num">{row.ties}</td>
+                  <td className="num board-num">{formatPct(row.pct)}</td>
+                  <td className="num board-num">{formatGb(row.gb)}</td>
+                  <td className="num board-num">{row.runsFor}</td>
+                  <td className="num board-num">{row.runsAgainst}</td>
+                  <td className="num board-num">
                     {diff > 0 ? `+${diff}` : diff}
                   </td>
                 </tr>

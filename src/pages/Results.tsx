@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { media, venueImage } from '../media'
 import { formatGameDate } from '../lib/standings'
 import { useStore } from '../store'
 
@@ -13,17 +14,29 @@ export function Results() {
 
   return (
     <div className="page">
-      <h1 className="page-title">결과</h1>
-      <p className="page-lead">확정된 경기 스코어와 한줄 메모입니다.</p>
+      <header className="page-banner">
+        <img src={media.hero} alt="" aria-hidden />
+        <div className="page-banner-shade" />
+        <div className="page-banner-copy">
+          <h1 className="page-title">결과</h1>
+          <p className="page-lead">확정된 경기 스코어와 한줄 메모입니다.</p>
+        </div>
+      </header>
       <div className="list">
         {finals.map((g, i) => {
           const r = state.results.find((x) => x.gameId === g.id)
           return (
             <div
               key={g.id}
-              className="row-item"
+              className="row-item row-item-visual"
               style={{ animationDelay: `${i * 0.05}s` }}
             >
+              <img
+                className="row-thumb"
+                src={venueImage(g.id + g.venue)}
+                alt=""
+                aria-hidden
+              />
               <div>
                 <div className="matchup">
                   {teamName(g.awayTeamId)} @ {teamName(g.homeTeamId)}
@@ -34,7 +47,7 @@ export function Results() {
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div className="score-chip">
+                <div className="score-chip pulse-amber">
                   {r ? `${r.awayRuns} — ${r.homeRuns}` : '—'}
                 </div>
                 <Link className="row-meta" to={`/ops/games/${g.id}`}>
