@@ -14,14 +14,17 @@ export function MatchCard({
   home,
   away,
   result,
+  large = false,
 }: {
   game: Game
   home?: Team
   away?: Team
   result?: GameResult
+  large?: boolean
 }) {
+  const logoSize = large ? 88 : 64
   return (
-    <article className="fixture-card">
+    <article className={`fixture-card${large ? ' fixture-card-lg' : ''}`}>
       <div className="fixture-card-top">
         <time dateTime={game.startsAt}>{formatGameDate(game.startsAt)}</time>
         <span className={`status-pill status-${game.status}`}>
@@ -30,7 +33,7 @@ export function MatchCard({
       </div>
       <div className="fixture-card-match">
         <div className="fixture-side">
-          <TeamLogo team={away} size={56} />
+          <TeamLogo team={away} size={logoSize} />
           <strong>{away?.shortName ?? '—'}</strong>
           <span>{away?.name}</span>
         </div>
@@ -44,12 +47,13 @@ export function MatchCard({
           )}
         </div>
         <div className="fixture-side">
-          <TeamLogo team={home} size={56} />
+          <TeamLogo team={home} size={logoSize} />
           <strong>{home?.shortName ?? '—'}</strong>
           <span>{home?.name}</span>
         </div>
       </div>
       <p className="fixture-meta">{game.venue}</p>
+      {result?.note ? <p className="fixture-note">{result.note}</p> : null}
       {game.status === 'final' ? (
         <Link className="fixture-link" to={`/ops/games/${game.id}`}>
           경기 기록 보기

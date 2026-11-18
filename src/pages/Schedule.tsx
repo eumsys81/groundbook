@@ -108,13 +108,16 @@ export function Schedule() {
         </button>
       </div>
 
-      <section className="section" style={{ paddingTop: '0.5rem' }}>
-        <h2>경기 카드</h2>
-        <p className="muted">가로로 넘겨 일정을 확인하세요.</p>
-        <div className="fixture-rail">
+      <section className="band band-schedule" style={{ marginTop: '0.5rem' }}>
+        <div className="band-inner">
+          <h2>경기 카드</h2>
+          <p className="muted">팀 로고와 스코어 · 가로로 넘겨 확인하세요.</p>
+        </div>
+        <div className="fixture-rail fixture-rail-home">
           {games.map((g) => (
             <MatchCard
               key={g.id}
+              large
               game={g}
               home={state.teams.find((t) => t.id === g.homeTeamId)}
               away={state.teams.find((t) => t.id === g.awayTeamId)}
