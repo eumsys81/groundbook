@@ -46,7 +46,7 @@ export function OpsOverview() {
           시즌 기록 입력
         </Link>
         <Link className="btn btn-ghost" to="/ops/schedule">
-          일정·경기 기록
+          일정 자동 생성·기록
         </Link>
         <Link className="btn btn-ghost" to="/ops/teams">
           팀 편집
