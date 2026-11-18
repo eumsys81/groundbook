@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import { seedState } from './data/seed'
+import { makeEmblem } from './lib/emblem'
 import type {
   AppState,
   BattingLine,
@@ -19,8 +20,8 @@ import type {
 } from './types'
 import { uid } from './lib/standings'
 
-const STORAGE_KEY = 'groundbook-mvp-v2'
-const LEGACY_KEYS = ['groundbook-mvp-v1']
+const STORAGE_KEY = 'groundbook-mvp-v3'
+const LEGACY_KEYS = ['groundbook-mvp-v2', 'groundbook-mvp-v1']
 
 type StoreApi = {
   state: AppState
@@ -41,14 +42,38 @@ type StoreApi = {
 
 const StoreContext = createContext<StoreApi | null>(null)
 
+function hydrateTeam(
+  t: Partial<Team> & Pick<Team, 'id' | 'leagueId' | 'name'>,
+  leagueId: string,
+): Team {
+  const shortName = t.shortName || t.name.slice(0, 3)
+  const colorHint = t.colorHint || '#7CFFB2'
+  return {
+    id: t.id,
+    leagueId,
+    name: t.name,
+    shortName,
+    colorHint,
+    managerName: t.managerName || '',
+    logoDataUrl: t.logoDataUrl || makeEmblem(shortName, colorHint),
+    foundedYear: t.foundedYear || new Date().getFullYear(),
+    homeGround: t.homeGround || '',
+    history: t.history || '',
+  }
+}
+
 function normalizeState(raw: Partial<AppState> | null): AppState {
   const base = structuredClone(seedState)
   if (!raw) return base
+  const leagueId = raw.league?.id ?? base.league.id
+  const teams = (raw.teams?.length ? raw.teams : base.teams).map((t) =>
+    hydrateTeam(t, leagueId),
+  )
   return {
     ...base,
     ...raw,
     league: { ...base.league, ...raw.league },
-    teams: raw.teams?.length ? raw.teams : base.teams,
+    teams,
     players: raw.players?.length ? raw.players : base.players,
     games: raw.games?.length ? raw.games : base.games,
     results: raw.results ?? base.results,
@@ -102,19 +127,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               ...s,
               teams: s.teams.map((t) =>
                 t.id === team.id
-                  ? { ...t, ...team, id: t.id, leagueId: s.league.id }
+                  ? hydrateTeam(
+                      { ...t, ...team, id: t.id, leagueId: s.league.id },
+                      s.league.id,
+                    )
                   : t,
               ),
             }
           }
-          const next: Team = {
-            id: uid('tm'),
-            leagueId: s.league.id,
-            name: team.name,
-            shortName: team.shortName,
-            colorHint: team.colorHint,
-            managerName: team.managerName,
-          }
+          const next = hydrateTeam(
+            {
+              id: uid('tm'),
+              leagueId: s.league.id,
+              name: team.name,
+              shortName: team.shortName,
+              colorHint: team.colorHint,
+              managerName: team.managerName,
+              logoDataUrl: team.logoDataUrl,
+              foundedYear: team.foundedYear,
+              homeGround: team.homeGround,
+              history: team.history,
+            },
+            s.league.id,
+          )
           return { ...s, teams: [...s.teams, next] }
         }),
       deleteTeam: (id) =>

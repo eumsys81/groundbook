@@ -1,3 +1,4 @@
+import { makeEmblem } from '../lib/emblem'
 import type { AppState, BattingLine, PitchingLine } from '../types'
 
 const LEAGUE_ID = 'lg-hanriver'
@@ -62,6 +63,11 @@ export const seedState: AppState = {
       shortName: '리버',
       colorHint: '#7CFFB2',
       managerName: '김도윤',
+      logoDataUrl: makeEmblem('리버', '#7CFFB2'),
+      foundedYear: 2018,
+      homeGround: '여의도 잔디구장',
+      history:
+        '한강변에서 출발한 동호회. 2022년 리그 합류 후 공격 야구로 알려졌습니다.',
     },
     {
       id: 'tm-north',
@@ -70,6 +76,11 @@ export const seedState: AppState = {
       shortName: '노스',
       colorHint: '#5B8CFF',
       managerName: '박서연',
+      logoDataUrl: makeEmblem('노스', '#5B8CFF'),
+      foundedYear: 2016,
+      homeGround: '뚝섬 한강공원 야구장',
+      history:
+        '북부권 클럽 연합으로 시작. 수비 조직력과 불펜 운영이 강점입니다.',
     },
     {
       id: 'tm-clay',
@@ -78,6 +89,11 @@ export const seedState: AppState = {
       shortName: '클레이',
       colorHint: '#FFB020',
       managerName: '이준호',
+      logoDataUrl: makeEmblem('클레이', '#FFB020'),
+      foundedYear: 2019,
+      homeGround: '잠실 보조야구장',
+      history:
+        '직장인 중심 창단. 장타력 있는 중장거리 타선으로 시즌을 치릅니다.',
     },
     {
       id: 'tm-wave',
@@ -86,6 +102,11 @@ export const seedState: AppState = {
       shortName: '웨이브',
       colorHint: '#FF6B8A',
       managerName: '최민지',
+      logoDataUrl: makeEmblem('웨이브', '#FF6B8A'),
+      foundedYear: 2020,
+      homeGround: '광나루 시민야구장',
+      history:
+        '신생 팀으로 출발해 빠르게 성장. 주축 선발과 기동력 야구가 특징입니다.',
     },
   ],
   players: [

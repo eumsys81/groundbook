@@ -1,14 +1,14 @@
 import { Link } from 'react-router-dom'
-import { media, venueImage } from '../media'
+import { MatchCard } from '../components/MatchCard'
+import { media } from '../media'
 import { battingLeaders, pitchingLeaders } from '../lib/stats'
-import { computeStandings, formatGameDate, formatPct } from '../lib/standings'
+import { computeStandings, formatPct } from '../lib/standings'
 import { useStore } from '../store'
 
 export function Home() {
   const { state } = useStore()
-  const upcoming = [...state.games]
-    .filter((g) => g.status === 'scheduled')
-    .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
+  const recent = [...state.games]
+    .sort((a, b) => b.startsAt.localeCompare(a.startsAt))
     .slice(0, 4)
 
   const standings = computeStandings(state).slice(0, 4)
@@ -16,38 +16,27 @@ export function Home() {
   const hrTop = battingLeaders(state, 'hr', 3)
   const eraTop = pitchingLeaders(state, 'era', 3)
 
-  const teamName = (id: string) =>
-    state.teams.find((t) => t.id === id)?.name ?? '—'
-  const teamShort = (id: string) =>
-    state.teams.find((t) => t.id === id)?.shortName ?? '—'
-  const teamColor = (id: string) =>
-    state.teams.find((t) => t.id === id)?.colorHint
-
   return (
     <>
       <section className="hero hero-photo" aria-label="그라운드북 소개">
-        <img
-          className="hero-photo-img"
-          src={media.hero}
-          alt=""
-          aria-hidden
-        />
+        <img className="hero-photo-img" src={media.hero} alt="" aria-hidden />
         <div className="hero-photo-shade" aria-hidden />
         <div className="hero-light-sweep" aria-hidden />
         <div className="hero-content">
           <h1 className="hero-brand">
             그라운드<em>북</em>
           </h1>
-          <p className="hero-headline">리그 순위와 기록을 한곳에서</p>
+          <p className="hero-headline">리그 운영과 기록을 한곳에서</p>
           <p className="hero-support">
-            야간 그라운드 분위기 그대로, 일정·순위·선수 기록을 바로 엽니다.
+            팀 로고·일정 카드·타석/마운드 기록까지. 야구 운영에 필요한 디테일을
+            담습니다.
           </p>
           <div className="cta-row">
-            <Link className="btn btn-primary" to="/standings">
-              순위·기록 보기
+            <Link className="btn btn-primary" to="/schedule">
+              최근 경기 일정
             </Link>
-            <Link className="btn btn-ghost" to="/schedule">
-              일정 슬라이드
+            <Link className="btn btn-ghost" to="/teams">
+              팀 현황
             </Link>
           </div>
         </div>
@@ -74,58 +63,32 @@ export function Home() {
           <img src={media.ball} alt="파울라인 위의 야구공" />
           <figcaption>
             <strong>기록은 그라운드에서</strong>
-            <span>타율·홈런·방어율까지 한 화면</span>
+            <span>타석판·마운드·시즌 순위</span>
           </figcaption>
         </figure>
       </section>
 
       <div className="page">
         <section className="section">
-          <h2>다가오는 경기</h2>
-          <p className="muted">사진 타일로 넘겨 보세요.</p>
-          {upcoming.length === 0 ? (
-            <p className="empty">예정된 경기가 없습니다.</p>
-          ) : (
-            <div className="home-rail visual-rail">
-              {upcoming.map((g, i) => (
-                <article
-                  key={g.id}
-                  className="match-poster"
-                  style={{ animationDelay: `${i * 0.08}s` }}
-                >
-                  <img src={venueImage(g.id + g.venue)} alt="" aria-hidden />
-                  <div className="match-poster-shade" />
-                  <div className="match-poster-body">
-                    <time>{formatGameDate(g.startsAt)}</time>
-                    <p className="matchup">
-                      <span
-                        className="team-swatch"
-                        style={{ background: teamColor(g.awayTeamId) }}
-                      />
-                      {teamShort(g.awayTeamId)}
-                      <em>@</em>
-                      <span
-                        className="team-swatch"
-                        style={{ background: teamColor(g.homeTeamId) }}
-                      />
-                      {teamShort(g.homeTeamId)}
-                    </p>
-                    <p className="row-meta">
-                      {teamName(g.awayTeamId)} vs {teamName(g.homeTeamId)}
-                    </p>
-                    <p className="row-meta">{g.venue}</p>
-                  </div>
-                </article>
-              ))}
+          <div className="section-head">
+            <div>
+              <h2>최근 경기 일정</h2>
+              <p className="muted">로고와 스코어로 한눈에 봅니다.</p>
             </div>
-          )}
-          <div className="cta-row" style={{ marginTop: '1.25rem' }}>
-            <Link className="btn btn-ghost" to="/schedule">
-              전체 일정
+            <Link className="inline-link" to="/schedule">
+              전체보기
             </Link>
-            <Link className="btn btn-ghost" to="/results">
-              지난 결과
-            </Link>
+          </div>
+          <div className="fixture-rail">
+            {recent.map((g) => (
+              <MatchCard
+                key={g.id}
+                game={g}
+                home={state.teams.find((t) => t.id === g.homeTeamId)}
+                away={state.teams.find((t) => t.id === g.awayTeamId)}
+                result={state.results.find((r) => r.gameId === g.id)}
+              />
+            ))}
           </div>
         </section>
 
@@ -152,11 +115,16 @@ export function Home() {
                     <tr key={row.teamId}>
                       <td className="board-rank">{idx + 1}</td>
                       <td>
-                        <span
-                          className="team-swatch"
-                          style={{ background: team?.colorHint }}
-                        />
-                        {team?.name}
+                        <Link className="team-inline" to={`/teams/${team?.id}`}>
+                          <img
+                            className="team-logo inline"
+                            src={team?.logoDataUrl}
+                            alt=""
+                            width={28}
+                            height={28}
+                          />
+                          {team?.name}
+                        </Link>
                       </td>
                       <td className="num board-num">{row.wins}</td>
                       <td className="num board-num">{row.losses}</td>
