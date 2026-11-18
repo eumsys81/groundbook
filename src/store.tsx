@@ -35,6 +35,15 @@ type StoreApi = {
     game: Omit<Game, 'id' | 'leagueId'> & { id?: string },
   ) => void
   deleteGame: (id: string) => void
+  /** Append many scheduled games (auto generator). */
+  bulkAddGames: (games: Omit<Game, 'id' | 'leagueId'>[]) => void
+  /** Remove non-final games (and their empty results). Keeps final results. */
+  clearOpenSchedule: () => void
+  /** Atomically replace open schedule and append generated drafts. */
+  applyGeneratedSchedule: (
+    games: Omit<Game, 'id' | 'leagueId'>[],
+    replaceOpen: boolean,
+  ) => void
   saveResult: (result: GameResult) => void
   upsertBatting: (line: BattingLine) => void
   upsertPitching: (line: PitchingLine) => void
@@ -228,6 +237,52 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           games: s.games.filter((g) => g.id !== id),
           results: s.results.filter((r) => r.gameId !== id),
         })),
+      bulkAddGames: (games) =>
+        setState((s) => {
+          const next: Game[] = games.map((game) => ({
+            id: uid('gm'),
+            leagueId: s.league.id,
+            homeTeamId: game.homeTeamId,
+            awayTeamId: game.awayTeamId,
+            startsAt: game.startsAt,
+            venue: game.venue,
+            status: game.status,
+          }))
+          return { ...s, games: [...s.games, ...next] }
+        }),
+      clearOpenSchedule: () =>
+        setState((s) => {
+          const keep = s.games.filter((g) => g.status === 'final')
+          const keepIds = new Set(keep.map((g) => g.id))
+          return {
+            ...s,
+            games: keep,
+            results: s.results.filter((r) => keepIds.has(r.gameId)),
+          }
+        }),
+      applyGeneratedSchedule: (games, replaceOpen) =>
+        setState((s) => {
+          const baseGames = replaceOpen
+            ? s.games.filter((g) => g.status === 'final')
+            : s.games
+          const keepIds = new Set(baseGames.map((g) => g.id))
+          const next: Game[] = games.map((game) => ({
+            id: uid('gm'),
+            leagueId: s.league.id,
+            homeTeamId: game.homeTeamId,
+            awayTeamId: game.awayTeamId,
+            startsAt: game.startsAt,
+            venue: game.venue,
+            status: game.status,
+          }))
+          return {
+            ...s,
+            games: [...baseGames, ...next],
+            results: replaceOpen
+              ? s.results.filter((r) => keepIds.has(r.gameId))
+              : s.results,
+          }
+        }),
       saveResult: (result) =>
         setState((s) => {
           const exists = s.results.some((r) => r.gameId === result.gameId)
