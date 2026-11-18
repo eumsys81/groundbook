@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 
 const links = [
@@ -11,25 +10,14 @@ const links = [
 ]
 
 export function PublicLayout() {
-  const [open, setOpen] = useState(false)
-
   return (
     <div className="app-shell">
       <header className="topbar">
         <div className="topbar-inner">
-          <NavLink to="/" className="brand-mark" onClick={() => setOpen(false)}>
+          <NavLink to="/" className="brand-mark">
             그라운드<span>북</span>
           </NavLink>
-          <button
-            type="button"
-            className="menu-toggle"
-            aria-expanded={open}
-            aria-label="메뉴"
-            onClick={() => setOpen((v) => !v)}
-          >
-            메뉴
-          </button>
-          <nav className={`nav-links${open ? ' open' : ''}`}>
+          <nav className="nav-links" aria-label="주요 메뉴">
             {links.map((l) => (
               <NavLink
                 key={l.to}
@@ -40,7 +28,6 @@ export function PublicLayout() {
                     .filter(Boolean)
                     .join(' ')
                 }
-                onClick={() => setOpen(false)}
               >
                 {l.label}
               </NavLink>
