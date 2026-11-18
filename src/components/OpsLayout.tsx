@@ -6,6 +6,7 @@ const links = [
   { to: '/ops/league', label: '리그' },
   { to: '/ops/teams', label: '팀' },
   { to: '/ops/players', label: '선수' },
+  { to: '/ops/stats', label: '시즌 기록' },
   { to: '/ops/schedule', label: '일정' },
 ]
 

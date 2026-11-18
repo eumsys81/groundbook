@@ -9,15 +9,18 @@ import {
 import { seedState } from './data/seed'
 import type {
   AppState,
+  BattingLine,
   Game,
   GameResult,
   League,
+  PitchingLine,
   Player,
   Team,
 } from './types'
 import { uid } from './lib/standings'
 
-const STORAGE_KEY = 'groundbook-mvp-v1'
+const STORAGE_KEY = 'groundbook-mvp-v2'
+const LEGACY_KEYS = ['groundbook-mvp-v1']
 
 type StoreApi = {
   state: AppState
@@ -32,15 +35,41 @@ type StoreApi = {
   ) => void
   deleteGame: (id: string) => void
   saveResult: (result: GameResult) => void
+  upsertBatting: (line: BattingLine) => void
+  upsertPitching: (line: PitchingLine) => void
 }
 
 const StoreContext = createContext<StoreApi | null>(null)
 
+function normalizeState(raw: Partial<AppState> | null): AppState {
+  const base = structuredClone(seedState)
+  if (!raw) return base
+  return {
+    ...base,
+    ...raw,
+    league: { ...base.league, ...raw.league },
+    teams: raw.teams?.length ? raw.teams : base.teams,
+    players: raw.players?.length ? raw.players : base.players,
+    games: raw.games?.length ? raw.games : base.games,
+    results: raw.results ?? base.results,
+    batting: raw.batting?.length ? raw.batting : base.batting,
+    pitching: raw.pitching?.length ? raw.pitching : base.pitching,
+  }
+}
+
 function loadState(): AppState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return structuredClone(seedState)
-    return JSON.parse(raw) as AppState
+    if (raw) return normalizeState(JSON.parse(raw) as Partial<AppState>)
+    for (const key of LEGACY_KEYS) {
+      const legacy = localStorage.getItem(key)
+      if (legacy) {
+        const merged = normalizeState(JSON.parse(legacy) as Partial<AppState>)
+        localStorage.removeItem(key)
+        return merged
+      }
+    }
+    return structuredClone(seedState)
   } catch {
     return structuredClone(seedState)
   }
@@ -89,19 +118,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           return { ...s, teams: [...s.teams, next] }
         }),
       deleteTeam: (id) =>
-        setState((s) => ({
-          ...s,
-          teams: s.teams.filter((t) => t.id !== id),
-          players: s.players.filter((p) => p.teamId !== id),
-          games: s.games.filter(
-            (g) => g.homeTeamId !== id && g.awayTeamId !== id,
-          ),
-          results: s.results.filter((r) => {
-            const g = s.games.find((x) => x.id === r.gameId)
-            if (!g) return false
-            return g.homeTeamId !== id && g.awayTeamId !== id
-          }),
-        })),
+        setState((s) => {
+          const playerIds = new Set(
+            s.players.filter((p) => p.teamId === id).map((p) => p.id),
+          )
+          return {
+            ...s,
+            teams: s.teams.filter((t) => t.id !== id),
+            players: s.players.filter((p) => p.teamId !== id),
+            games: s.games.filter(
+              (g) => g.homeTeamId !== id && g.awayTeamId !== id,
+            ),
+            results: s.results.filter((r) => {
+              const g = s.games.find((x) => x.id === r.gameId)
+              if (!g) return false
+              return g.homeTeamId !== id && g.awayTeamId !== id
+            }),
+            batting: s.batting.filter((b) => !playerIds.has(b.playerId)),
+            pitching: s.pitching.filter((p) => !playerIds.has(p.playerId)),
+          }
+        }),
       upsertPlayer: (player) =>
         setState((s) => {
           if (player.id) {
@@ -125,6 +161,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setState((s) => ({
           ...s,
           players: s.players.filter((p) => p.id !== id),
+          batting: s.batting.filter((b) => b.playerId !== id),
+          pitching: s.pitching.filter((p) => p.playerId !== id),
         })),
       upsertGame: (game) =>
         setState((s) => {
@@ -167,6 +205,30 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             games: s.games.map((g) =>
               g.id === result.gameId ? { ...g, status: 'final' as const } : g,
             ),
+          }
+        }),
+      upsertBatting: (line) =>
+        setState((s) => {
+          const exists = s.batting.some((b) => b.playerId === line.playerId)
+          return {
+            ...s,
+            batting: exists
+              ? s.batting.map((b) =>
+                  b.playerId === line.playerId ? line : b,
+                )
+              : [...s.batting, line],
+          }
+        }),
+      upsertPitching: (line) =>
+        setState((s) => {
+          const exists = s.pitching.some((p) => p.playerId === line.playerId)
+          return {
+            ...s,
+            pitching: exists
+              ? s.pitching.map((p) =>
+                  p.playerId === line.playerId ? line : p,
+                )
+              : [...s.pitching, line],
           }
         }),
     }),

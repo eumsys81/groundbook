@@ -31,6 +31,18 @@ await page.waitForSelector('.page-title')
 console.log('standings title:', await page.locator('.page-title').innerText())
 await shot(page, 'verify-desktop-standings.png')
 
+await page.click('nav a[href="/leaders"]')
+await page.waitForURL('**/leaders')
+await page.waitForSelector('.page-title')
+console.log('leaders title:', await page.locator('.page-title').innerText())
+await shot(page, 'verify-desktop-leaders.png')
+
+await page.click('nav a[href="/schedule"]')
+await page.waitForURL('**/schedule')
+await page.waitForSelector('.day-rail')
+console.log('schedule rail ok')
+await shot(page, 'verify-desktop-schedule.png')
+
 await page.click('nav a[href="/ops"]')
 await page.waitForURL('**/ops')
 await page.waitForSelector('.page-title')
