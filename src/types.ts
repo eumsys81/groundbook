@@ -1,5 +1,17 @@
 export type GameStatus = 'scheduled' | 'final' | 'postponed'
-export type Position = '투수' | '포수' | '1루수' | '2루수' | '3루수' | '유격수' | '좌익수' | '중견수' | '우익수' | '지명타자' | '내야수' | '외야수'
+export type Position =
+  | '투수'
+  | '포수'
+  | '1루수'
+  | '2루수'
+  | '3루수'
+  | '유격수'
+  | '좌익수'
+  | '중견수'
+  | '우익수'
+  | '지명타자'
+  | '내야수'
+  | '외야수'
 
 export interface League {
   id: string
@@ -52,12 +64,49 @@ export interface Game {
   status: GameStatus
 }
 
+/** 시즌 타격 누적 (시드·운영 입력) */
+export interface BattingLine {
+  playerId: string
+  g: number
+  pa: number
+  ab: number
+  r: number
+  h: number
+  doubles: number
+  triples: number
+  hr: number
+  rbi: number
+  bb: number
+  so: number
+  sb: number
+  cs: number
+}
+
+/** 시즌 투구 누적 — ipOuts는 아웃 수(이닝×3) */
+export interface PitchingLine {
+  playerId: string
+  g: number
+  gs: number
+  w: number
+  l: number
+  sv: number
+  ipOuts: number
+  h: number
+  r: number
+  er: number
+  bb: number
+  so: number
+  hr: number
+}
+
 export interface AppState {
   league: League
   teams: Team[]
   players: Player[]
   games: Game[]
   results: GameResult[]
+  batting: BattingLine[]
+  pitching: PitchingLine[]
 }
 
 export interface StandingRow {
@@ -68,4 +117,5 @@ export interface StandingRow {
   runsFor: number
   runsAgainst: number
   pct: number
+  gb: number
 }

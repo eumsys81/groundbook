@@ -1,6 +1,48 @@
-import type { AppState } from '../types'
+import type { AppState, BattingLine, PitchingLine } from '../types'
 
 const LEAGUE_ID = 'lg-hanriver'
+
+const batting: BattingLine[] = [
+  // 리버폭스
+  { playerId: 'p1', g: 4, pa: 8, ab: 7, r: 1, h: 2, doubles: 0, triples: 0, hr: 0, rbi: 1, bb: 1, so: 2, sb: 0, cs: 0 },
+  { playerId: 'p2', g: 8, pa: 32, ab: 28, r: 5, h: 9, doubles: 2, triples: 0, hr: 1, rbi: 6, bb: 3, so: 4, sb: 0, cs: 0 },
+  { playerId: 'p3', g: 8, pa: 34, ab: 30, r: 7, h: 11, doubles: 3, triples: 0, hr: 2, rbi: 9, bb: 3, so: 5, sb: 0, cs: 1 },
+  { playerId: 'p4', g: 8, pa: 35, ab: 31, r: 9, h: 13, doubles: 4, triples: 1, hr: 1, rbi: 7, bb: 3, so: 3, sb: 4, cs: 1 },
+  { playerId: 'p5', g: 8, pa: 33, ab: 29, r: 8, h: 10, doubles: 1, triples: 1, hr: 0, rbi: 4, bb: 3, so: 6, sb: 6, cs: 0 },
+  { playerId: 'p6', g: 8, pa: 30, ab: 27, r: 4, h: 8, doubles: 2, triples: 0, hr: 1, rbi: 5, bb: 2, so: 7, sb: 1, cs: 0 },
+  // 노스게이트
+  { playerId: 'p7', g: 3, pa: 6, ab: 5, r: 0, h: 1, doubles: 0, triples: 0, hr: 0, rbi: 0, bb: 1, so: 2, sb: 0, cs: 0 },
+  { playerId: 'p8', g: 8, pa: 31, ab: 27, r: 4, h: 8, doubles: 1, triples: 0, hr: 0, rbi: 3, bb: 3, so: 5, sb: 0, cs: 0 },
+  { playerId: 'p9', g: 8, pa: 34, ab: 30, r: 6, h: 10, doubles: 2, triples: 0, hr: 1, rbi: 5, bb: 3, so: 4, sb: 3, cs: 1 },
+  { playerId: 'p10', g: 8, pa: 32, ab: 28, r: 5, h: 9, doubles: 3, triples: 0, hr: 2, rbi: 8, bb: 3, so: 6, sb: 0, cs: 0 },
+  { playerId: 'p11', g: 8, pa: 33, ab: 29, r: 7, h: 12, doubles: 2, triples: 1, hr: 1, rbi: 6, bb: 3, so: 5, sb: 2, cs: 0 },
+  { playerId: 'p12', g: 7, pa: 28, ab: 25, r: 3, h: 6, doubles: 1, triples: 0, hr: 0, rbi: 2, bb: 2, so: 4, sb: 1, cs: 0 },
+  // 클레이나이츠
+  { playerId: 'p13', g: 4, pa: 7, ab: 6, r: 0, h: 1, doubles: 0, triples: 0, hr: 0, rbi: 0, bb: 1, so: 3, sb: 0, cs: 0 },
+  { playerId: 'p14', g: 8, pa: 30, ab: 26, r: 3, h: 7, doubles: 1, triples: 0, hr: 0, rbi: 4, bb: 3, so: 5, sb: 0, cs: 0 },
+  { playerId: 'p15', g: 8, pa: 35, ab: 31, r: 8, h: 12, doubles: 3, triples: 0, hr: 1, rbi: 5, bb: 3, so: 4, sb: 5, cs: 1 },
+  { playerId: 'p16', g: 8, pa: 33, ab: 29, r: 6, h: 9, doubles: 2, triples: 0, hr: 3, rbi: 10, bb: 3, so: 8, sb: 0, cs: 0 },
+  { playerId: 'p17', g: 8, pa: 32, ab: 28, r: 5, h: 8, doubles: 1, triples: 1, hr: 0, rbi: 3, bb: 3, so: 6, sb: 4, cs: 0 },
+  { playerId: 'p18', g: 7, pa: 26, ab: 24, r: 2, h: 5, doubles: 1, triples: 0, hr: 0, rbi: 2, bb: 1, so: 7, sb: 0, cs: 0 },
+  // 웨이브윙스
+  { playerId: 'p19', g: 5, pa: 9, ab: 8, r: 1, h: 2, doubles: 1, triples: 0, hr: 0, rbi: 1, bb: 1, so: 2, sb: 0, cs: 0 },
+  { playerId: 'p20', g: 8, pa: 31, ab: 27, r: 4, h: 8, doubles: 2, triples: 0, hr: 1, rbi: 5, bb: 3, so: 4, sb: 0, cs: 0 },
+  { playerId: 'p21', g: 8, pa: 34, ab: 30, r: 7, h: 11, doubles: 2, triples: 0, hr: 0, rbi: 4, bb: 3, so: 3, sb: 7, cs: 1 },
+  { playerId: 'p22', g: 8, pa: 32, ab: 28, r: 6, h: 9, doubles: 1, triples: 1, hr: 1, rbi: 6, bb: 3, so: 5, sb: 3, cs: 0 },
+  { playerId: 'p23', g: 8, pa: 30, ab: 27, r: 5, h: 7, doubles: 2, triples: 0, hr: 2, rbi: 7, bb: 2, so: 6, sb: 0, cs: 0 },
+  { playerId: 'p24', g: 8, pa: 33, ab: 29, r: 8, h: 14, doubles: 3, triples: 0, hr: 2, rbi: 9, bb: 3, so: 4, sb: 1, cs: 0 },
+]
+
+const pitching: PitchingLine[] = [
+  { playerId: 'p1', g: 3, gs: 3, w: 2, l: 0, sv: 0, ipOuts: 54, h: 14, r: 5, er: 4, bb: 4, so: 18, hr: 0 },
+  { playerId: 'p7', g: 3, gs: 3, w: 1, l: 1, sv: 0, ipOuts: 48, h: 16, r: 8, er: 7, bb: 5, so: 14, hr: 1 },
+  { playerId: 'p13', g: 3, gs: 2, w: 0, l: 2, sv: 0, ipOuts: 39, h: 18, r: 11, er: 10, bb: 6, so: 9, hr: 2 },
+  { playerId: 'p19', g: 3, gs: 3, w: 2, l: 1, sv: 0, ipOuts: 57, h: 12, r: 4, er: 3, bb: 3, so: 22, hr: 0 },
+  { playerId: 'p4', g: 2, gs: 0, w: 0, l: 0, sv: 1, ipOuts: 9, h: 2, r: 0, er: 0, bb: 1, so: 4, hr: 0 },
+  { playerId: 'p9', g: 2, gs: 0, w: 0, l: 0, sv: 1, ipOuts: 6, h: 1, r: 1, er: 1, bb: 2, so: 2, hr: 0 },
+  { playerId: 'p15', g: 1, gs: 0, w: 0, l: 0, sv: 0, ipOuts: 3, h: 2, r: 1, er: 1, bb: 0, so: 1, hr: 0 },
+  { playerId: 'p21', g: 1, gs: 0, w: 0, l: 0, sv: 1, ipOuts: 6, h: 0, r: 0, er: 0, bb: 1, so: 3, hr: 0 },
+]
 
 export const seedState: AppState = {
   league: {
@@ -9,7 +51,7 @@ export const seedState: AppState = {
     seasonLabel: '2026 봄 시즌',
     region: '서울 · 경기',
     description:
-      '주말 저녁, 동네 구장에서 만나는 동호인 리그. 그라운드북으로 일정과 결과·순위를 한곳에서 챙깁니다.',
+      '주말 저녁, 동네 구장에서 만나는 동호인 리그. 일정·팀순위·선수 기록까지 그라운드북에서 한눈에 봅니다.',
     updatedAt: '2026-11-18T09:00:00.000Z',
   },
   teams: [
@@ -47,28 +89,24 @@ export const seedState: AppState = {
     },
   ],
   players: [
-    // 리버폭스
     { id: 'p1', teamId: 'tm-river', name: '한지우', number: 7, position: '투수' },
     { id: 'p2', teamId: 'tm-river', name: '오세훈', number: 2, position: '포수' },
     { id: 'p3', teamId: 'tm-river', name: '정우성', number: 3, position: '1루수' },
     { id: 'p4', teamId: 'tm-river', name: '강민재', number: 14, position: '유격수' },
     { id: 'p5', teamId: 'tm-river', name: '윤하늘', number: 9, position: '중견수' },
     { id: 'p6', teamId: 'tm-river', name: '배성진', number: 21, position: '좌익수' },
-    // 노스게이트
     { id: 'p7', teamId: 'tm-north', name: '서준혁', number: 18, position: '투수' },
     { id: 'p8', teamId: 'tm-north', name: '임다은', number: 5, position: '포수' },
     { id: 'p9', teamId: 'tm-north', name: '조현우', number: 11, position: '2루수' },
     { id: 'p10', teamId: 'tm-north', name: '문채원', number: 24, position: '3루수' },
     { id: 'p11', teamId: 'tm-north', name: '홍기태', number: 8, position: '우익수' },
     { id: 'p12', teamId: 'tm-north', name: '신예린', number: 33, position: '내야수' },
-    // 클레이나이츠
     { id: 'p13', teamId: 'tm-clay', name: '권태오', number: 1, position: '투수' },
     { id: 'p14', teamId: 'tm-clay', name: '남궁석', number: 27, position: '포수' },
     { id: 'p15', teamId: 'tm-clay', name: '류진아', number: 6, position: '유격수' },
     { id: 'p16', teamId: 'tm-clay', name: '송하준', number: 15, position: '1루수' },
     { id: 'p17', teamId: 'tm-clay', name: '안보람', number: 19, position: '중견수' },
     { id: 'p18', teamId: 'tm-clay', name: '장도현', number: 42, position: '외야수' },
-    // 웨이브윙스
     { id: 'p19', teamId: 'tm-wave', name: '표세영', number: 10, position: '투수' },
     { id: 'p20', teamId: 'tm-wave', name: '하은서', number: 4, position: '포수' },
     { id: 'p21', teamId: 'tm-wave', name: '고민수', number: 13, position: '2루수' },
@@ -149,6 +187,24 @@ export const seedState: AppState = {
       venue: '광나루 시민야구장',
       status: 'postponed',
     },
+    {
+      id: 'g9',
+      leagueId: LEAGUE_ID,
+      homeTeamId: 'tm-river',
+      awayTeamId: 'tm-wave',
+      startsAt: '2026-12-06T10:00:00+09:00',
+      venue: '여의도 잔디구장 A',
+      status: 'scheduled',
+    },
+    {
+      id: 'g10',
+      leagueId: LEAGUE_ID,
+      homeTeamId: 'tm-clay',
+      awayTeamId: 'tm-north',
+      startsAt: '2026-12-06T13:00:00+09:00',
+      venue: '여의도 잔디구장 B',
+      status: 'scheduled',
+    },
   ],
   results: [
     {
@@ -216,4 +272,6 @@ export const seedState: AppState = {
       recordedAt: '2026-11-15T15:15:00+09:00',
     },
   ],
+  batting,
+  pitching,
 }

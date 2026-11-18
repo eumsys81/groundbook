@@ -11,6 +11,7 @@ export function computeStandings(state: AppState): StandingRow[] {
       runsFor: 0,
       runsAgainst: 0,
       pct: 0,
+      gb: 0,
     })
   }
 
@@ -45,13 +46,27 @@ export function computeStandings(state: AppState): StandingRow[] {
     row.pct = decided === 0 ? 0 : row.wins / decided
   }
 
-  return rows.sort((a, b) => {
+  rows.sort((a, b) => {
     if (b.pct !== a.pct) return b.pct - a.pct
     if (b.wins !== a.wins) return b.wins - a.wins
     const aDiff = a.runsFor - a.runsAgainst
     const bDiff = b.runsFor - b.runsAgainst
     return bDiff - aDiff
   })
+
+  const leader = rows[0]
+  if (leader) {
+    for (const row of rows) {
+      row.gb = (leader.wins - row.wins + (row.losses - leader.losses)) / 2
+    }
+  }
+
+  return rows
+}
+
+export function formatGb(gb: number): string {
+  if (gb === 0) return '—'
+  return Number.isInteger(gb) ? String(gb) : gb.toFixed(1)
 }
 
 export function formatPct(pct: number): string {
