@@ -1,6 +1,10 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { generateSchedule } from '../../lib/scheduleGen'
+import { ScheduleAssignBoard } from '../../components/ScheduleAssignBoard'
+import {
+  generateSchedule,
+  type ScheduleDraft,
+} from '../../lib/scheduleGen'
 import type { GameStatus } from '../../types'
 import { formatGameDate } from '../../lib/standings'
 import { useStore } from '../../store'
@@ -33,6 +37,13 @@ export function ScheduleAdmin() {
     seed: '',
   })
   const [genMsg, setGenMsg] = useState<string | null>(null)
+  const [boardOpen, setBoardOpen] = useState(false)
+  const [pendingDrafts, setPendingDrafts] = useState<ScheduleDraft[]>([])
+  const [pendingPerTeam, setPendingPerTeam] = useState<Record<string, number>>(
+    {},
+  )
+  const [pendingWarnings, setPendingWarnings] = useState<string[]>([])
+  const [pendingReplace, setPendingReplace] = useState(true)
 
   const games = [...state.games].sort((a, b) =>
     a.startsAt.localeCompare(b.startsAt),
@@ -87,23 +98,50 @@ export function ScheduleAdmin() {
       setGenMsg(warnings.join(' ') || '생성된 경기가 없습니다.')
       return
     }
-    applyGeneratedSchedule(drafts, gen.replaceOpen)
+    setPendingDrafts(drafts)
+    setPendingPerTeam(perTeam)
+    setPendingWarnings(warnings)
+    setPendingReplace(gen.replaceOpen)
+    setBoardOpen(true)
+    setGenMsg(null)
+  }
+
+  const confirmBoard = () => {
+    applyGeneratedSchedule(pendingDrafts, pendingReplace)
     const lines = state.teams.map((t) => {
-      const n = perTeam[t.id] ?? 0
+      const n = pendingPerTeam[t.id] ?? 0
       return `${t.shortName} ${n}경기`
     })
     setGenMsg(
-      `자동 생성 ${drafts.length}경기. ${lines.join(' · ')}` +
-        (warnings.length ? ` / 참고: ${warnings.join(' ')}` : ''),
+      `자동 생성 ${pendingDrafts.length}경기 반영. ${lines.join(' · ')}` +
+        (pendingWarnings.length
+          ? ` / 참고: ${pendingWarnings.join(' ')}`
+          : ''),
     )
+    setBoardOpen(false)
+    setPendingDrafts([])
   }
 
   return (
     <>
+      <ScheduleAssignBoard
+        open={boardOpen}
+        drafts={pendingDrafts}
+        teams={state.teams}
+        perTeam={pendingPerTeam}
+        warnings={pendingWarnings}
+        onCancel={() => {
+          setBoardOpen(false)
+          setPendingDrafts([])
+          setGenMsg('배정을 취소했습니다. 일정은 아직 반영되지 않았습니다.')
+        }}
+        onComplete={confirmBoard}
+      />
+
       <h1 className="page-title">일정 관리</h1>
       <p className="page-lead">
-        시즌 시작 전 일정을 한 번에 만들거나, 경기를 개별 추가합니다. 자동
-        생성은 팀당 목표 경기 수(예: 60)를 기준으로 대진을 섞어 배정합니다.
+        시즌 시작 전 일정을 한 번에 만들거나, 경기를 개별 추가합니다. 랜덤
+        생성 시 배정판이 열려 경기가 순서대로 채워지는 모습을 보여 줍니다.
       </p>
 
       <div className="interact-box">
